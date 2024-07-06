@@ -21,13 +21,13 @@ class Schema:
 class ExchangeRateSchema(Schema):
     keys = ["bank_id"]
     schema = {
-        "bank_id" : "uuid",
+        "bank_id": "uuid",
         "bank_name": "text",
         "link": "text",
         "eur/rub": "float",
         "usd/rub": "float",
         "rub/eur": "float",
-        "rub/usd": "float"
+        "rub/usd": "float",
     }
 
 

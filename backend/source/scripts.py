@@ -7,6 +7,7 @@ import jwt
 import logging
 import re
 
+
 def get_user(login, cursor):
     cursor.execute(sql.SELECT_USER.format(login))
     return cursor.fetchone()
@@ -51,4 +52,3 @@ def change_user_data(data, login, cursor):
     if data.birth_day:
         new_set += [f"birth_day = '{data.birth_day}'"]
     cursor.execute(sql.UPDATE_USER.format(", ".join(new_set), login))
-

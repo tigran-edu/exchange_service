@@ -37,6 +37,7 @@ def create_pg_client():
     _connection.autocommit = True
     PG_CLIENT = _connection.cursor(cursor_factory=RealDictCursor)
 
+
 def close_client():
     _connection.close()
     PG_CLIENT.close()

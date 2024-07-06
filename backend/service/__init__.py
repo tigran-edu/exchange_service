@@ -19,7 +19,6 @@ async def lifespan(app: FastAPI):
     logging.info("Creating PG client")
     create_pg_client()
     yield
-    
 
 
 app = FastAPI(lifespan=lifespan)
