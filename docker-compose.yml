@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: rates_db
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: "rates_db"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "user"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - rates:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - global_network
+
+  backend:
+    container_name: backend
+    build:
+      context: ./
+      dockerfile: backend/service/Dockerfile
+    environment:
+      PYTHONUNBUFFERED: 1
+      UVICORN_PORT: 80
+      UVICORN_HOST: "0.0.0.0"
+      POSTGRES_DB: "rates_db"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "user"
+      POSTGRES_HOST: "rates_db"
+      POSTGRES_PORT: 5432
+    ports:
+      - "80:80"
+    links:
+      - postgres
+    networks:
+      - global_network
+
+volumes:
+  rates:
+    name: rates
+
+networks:
+  global_network:
+    name: global_network
