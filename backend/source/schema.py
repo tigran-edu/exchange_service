@@ -24,10 +24,10 @@ class ExchangeRateSchema(Schema):
         "bank_id": "uuid",
         "bank_name": "text",
         "link": "text",
-        "eur/rub": "float",
-        "usd/rub": "float",
-        "rub/eur": "float",
-        "rub/usd": "float",
+        "eur->rub": "float",
+        "usd->rub": "float",
+        "rub->eur": "float",
+        "rub->usd": "float",
     }
 
 

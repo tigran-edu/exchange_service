@@ -1,24 +1,38 @@
-import requests
-from bs4 import BeautifulSoup
 import abc
-from typing import Collection
+from enum import IntEnum
+from typing import Optional
+
+
+class Exchange:
+    buy: float
+    sell: float
+
+    def __str__(self):
+        return f"buy: {self.buy} | sell: {self.sell}"
+
+
+class StatusCode(IntEnum):
+    OK = 0
+    GetError = 1
+    ClickError = 2
+    GetTableError = 3
+    EvaluationError = 4
+
+
+class WebSiteResonse:
+    def __init__(self, return_code: StatusCode, rates: Optional[dict]):
+        self.return_code = return_code
+        self.rates = rates
 
 
 class WebSite:
     url: str
+    currencies = ["USD", "EUR", "RUR"]
 
     @abc.abstractmethod
-    def handle(self, html):
+    async def handle(self, html) -> WebSiteResonse:
         pass
 
-
-class ParserResonse:
-    def __init__(self):
-        pass
-
-
-class Parser:
     @abc.abstractmethod
-    @staticmethod
-    def pars(websites: Collection[WebSite]) -> ParserResonse:
+    def make_response(self, table: str) -> WebSiteResonse:
         pass

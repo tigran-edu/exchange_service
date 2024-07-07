@@ -19,6 +19,7 @@ services:
 
   backend:
     container_name: backend
+    platform: linux/amd64
     build:
       context: ./
       dockerfile: backend/service/Dockerfile
