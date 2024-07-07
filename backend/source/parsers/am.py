@@ -1,5 +1,5 @@
-# from backend.source.parsers.basic import *
-from basic import *
+from backend.source.parsers.basic import *
+from backend.source.clients.selenium import SELENIUM_CLIENT
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,17 +19,14 @@ class ArdishBank(WebSite):
         self.table_xpath = (
             '//*[@id="__nuxt"]/div/div/section[3]/div/div[1]/div[3]/table'
         )
+        self.browser = SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
-        logging.info("Parser start for ArdishBank")
-        browser = webdriver.Chrome(
-            service=webdriver.ChromeService(
-                executable_path="/usr/bin/chromedriver"
-            )
-        )
+        logging.info("Handle start for ArdishBank")
+
         try:
             logging.info(f"Get request {self.url}")
-            browser.get(self.url)
+            self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
             logging.error(f"Get request failed {self.url}")
@@ -37,7 +34,7 @@ class ArdishBank(WebSite):
 
         try:
             logging.info("Click besnal button")
-            WebDriverWait(browser, 20).until(
+            WebDriverWait(self.browser, 20).until(
                 EC.element_to_be_clickable((By.XPATH, self.besnal_button_xpath))
             ).click()
         except Exception as ex:
@@ -46,7 +43,7 @@ class ArdishBank(WebSite):
 
         try:
             logging.info("Find rates table")
-            table = browser.find_element(By.XPATH, self.table_xpath).get_attribute(
+            table = self.browser.find_element(By.XPATH, self.table_xpath).get_attribute(
                 "innerHTML"
             )
         except Exception as ex:
@@ -94,17 +91,14 @@ class AmeriaBank(WebSite):
         self.table_xpath = (
             '//*[@id="dnn_ctr44240_View_grdRates"]'
         )
+        self.browser = SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
-        logging.info("Parser start for AmeriaBank")
-        browser = webdriver.Chrome(
-            service=webdriver.ChromeService(
-                executable_path="/opt/homebrew/bin/chromedriver"
-            )
-        )
+        logging.info("Handle start for AmeriaBank")
+
         try:
             logging.info(f"Get request {self.url}")
-            browser.get(self.url)
+            self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
             logging.error(f"Get request failed {self.url}")
@@ -112,7 +106,7 @@ class AmeriaBank(WebSite):
 
         try:
             logging.info("Find rates table")
-            table = browser.find_element(By.XPATH, self.table_xpath).get_attribute(
+            table = self.browser.find_element(By.XPATH, self.table_xpath).get_attribute(
                 "innerHTML"
             )
         except Exception as ex:
@@ -126,18 +120,18 @@ class AmeriaBank(WebSite):
             [cell.text for cell in row("td")]
             for row in BeautifulSoup(table, "html.parser")("tr")
         ]
-        raise Exception(table_data)
+
         logging.info(f"Table schema {table_data[0]}")
         table_dict = defaultdict(Exchange)
         try:
             rur_data, usd_data, eur_data = self.find_currency(
-                table_data, ["RUR", "USD", "EUR"]
+                table_data, ["RUB", "USD", "EUR"]
             )
-            table_dict["USD"].buy = float(rur_data[1]) / float(usd_data[2])
-            table_dict["USD"].sell = float(usd_data[1]) / float(rur_data[2])
+            table_dict["USD"].buy = float(rur_data[3].replace(",", ".")) / float(usd_data[4].replace(",", "."))
+            table_dict["USD"].sell = float(usd_data[3].replace(",", ".")) / float(rur_data[4].replace(",", "."))
 
-            table_dict["EUR"].buy = float(rur_data[1]) / float(eur_data[2])
-            table_dict["EUR"].sell = float(eur_data[1]) / float(rur_data[2])
+            table_dict["EUR"].buy = float(rur_data[3].replace(",", ".")) / float(eur_data[4].replace(",", "."))
+            table_dict["EUR"].sell = float(eur_data[3].replace(",", ".")) / float(rur_data[4].replace(",", "."))
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
             return WebSiteResonse(return_code=StatusCode.EvaluationError)

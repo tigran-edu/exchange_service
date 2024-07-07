@@ -17,9 +17,19 @@ services:
     networks:
       - global_network
 
+  selenium:
+    container_name: selenium
+    image: selenium/standalone-chrome:latest
+    hostname: chrome
+    privileged: true
+    ports:
+      - "4444:4444"
+    shm_size: 2g
+    networks:
+      - global_network
+
   backend:
     container_name: backend
-    platform: linux/amd64
     build:
       context: ./
       dockerfile: backend/service/Dockerfile
@@ -35,6 +45,7 @@ services:
     ports:
       - "80:80"
     links:
+      - selenium
       - postgres
     networks:
       - global_network

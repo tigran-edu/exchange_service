@@ -1,10 +1,10 @@
-from backend.source.parsers.am import ArdishBank
+from backend.source.parsers.am import *
 from backend.source.parsers.basic import WebSite
 from typing import Collection
 
 
 CONFIG = {
-    "ARMENIA": [ArdishBank()]
+    "ARMENIA": [ArdishBank(), AmeriaBank()]
 }
 class ParserResonse:
     def __init__(self):

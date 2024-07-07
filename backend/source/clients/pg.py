@@ -26,7 +26,7 @@ def try_connect():
             break
         except Exception:
             counter -= 1
-            # time.sleep(10)
+            time.sleep(10)
     if conn == None:
         raise Exception("Can not connect to the PG.")
     return conn
