@@ -3,6 +3,7 @@ import psycopg2
 import time
 import os
 import logging
+import backend.source.scripts as scripts
 
 _connection = None
 PG_CLIENT = None
@@ -33,11 +34,13 @@ def try_connect():
 
 
 def create_pg_client():
+    global PG_CLIENT
     _connection = try_connect()
     _connection.autocommit = True
     PG_CLIENT = _connection.cursor(cursor_factory=RealDictCursor)
 
 
 def close_client():
+    global PG_CLIENT
     _connection.close()
     PG_CLIENT.close()

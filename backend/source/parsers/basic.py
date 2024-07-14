@@ -1,4 +1,5 @@
 import abc
+import time
 from enum import IntEnum
 from typing import Optional
 
@@ -20,13 +21,23 @@ class StatusCode(IntEnum):
 
 
 class WebSiteResonse:
-    def __init__(self, return_code: StatusCode, rates: Optional[dict]):
+    def __init__(
+        self, return_code: StatusCode, bank: str, rates: Optional[dict] = None
+    ):
         self.return_code = return_code
         self.rates = rates
+        self.bank = bank
+        self.timestamp = int(time.time())
+
+    def __str__(self):
+        if self.rates is None:
+            raise Exception("No rates.")
+        return f"'{self.bank}', {self.timestamp}, {self.rates['EUR'].sell}, {self.rates['USD'].sell}, {self.rates['EUR'].buy}, {self.rates['USD'].buy}"
 
 
 class WebSite:
     url: str
+    bank: str
     currencies = ["USD", "EUR", "RUR"]
 
     @abc.abstractmethod

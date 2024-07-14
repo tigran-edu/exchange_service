@@ -12,8 +12,8 @@ services:
     volumes:
       - ../2. Init Database:/docker-entrypoint-initdb.d
       - rates:/var/lib/postgresql/data
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     networks:
       - global_network
 
@@ -27,6 +27,20 @@ services:
     shm_size: 2g
     networks:
       - global_network
+
+  # pgadmin:
+  #   container_name: pgadmin4_container
+  #   image: dpage/pgadmin4:7
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+  #   networks:
+  #     - global_network
 
   backend:
     container_name: backend
@@ -53,6 +67,8 @@ services:
 volumes:
   rates:
     name: rates
+  pgadmin-data:
+    name: pgadmin-data
 
 networks:
   global_network:

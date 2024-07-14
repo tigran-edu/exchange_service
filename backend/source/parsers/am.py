@@ -13,6 +13,7 @@ import time
 class ArdishBank(WebSite):
     def __init__(self):
         self.url = "https://ardshinbank.am/for_you/Artarjuyti-poxanakum?lang=ru"
+        self.bank = "Ardshinbank"
         self.besnal_button_xpath = (
             '//*[@id="__nuxt"]/div/div/section[3]/div/div[1]/div[2]/div/div[2]/div[2]'
         )
@@ -30,7 +31,7 @@ class ArdishBank(WebSite):
             time.sleep(1)
         except Exception as ex:
             logging.error(f"Get request failed {self.url}")
-            return WebSiteResonse(return_code=StatusCode.GetError)
+            return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
             logging.info("Click besnal button")
@@ -39,7 +40,7 @@ class ArdishBank(WebSite):
             ).click()
         except Exception as ex:
             logging.error(f"Click besnal button failed: {ex}")
-            return WebSiteResonse(return_code=StatusCode.ClickError)
+            return WebSiteResonse(return_code=StatusCode.ClickError, bank=self.bank)
 
         try:
             logging.info("Find rates table")
@@ -48,7 +49,7 @@ class ArdishBank(WebSite):
             )
         except Exception as ex:
             logging.error(f"Find rates table failed: {ex}")
-            return WebSiteResonse(return_code=StatusCode.GetTableError)
+            return WebSiteResonse(return_code=StatusCode.GetTableError, bank=self.bank)
 
         return self.make_response(table)
 
@@ -58,22 +59,26 @@ class ArdishBank(WebSite):
             for row in BeautifulSoup(table, "html.parser")("tr")
         ]
 
-        logging.info(f"Table schema {table_data[0]}")
+        logging.info(f"Table {table_data}")
         table_dict = defaultdict(Exchange)
         try:
             rur_data, usd_data, eur_data = self.find_currency(
                 table_data, ["RUR", "USD", "EUR"]
             )
-            table_dict["USD"].buy = float(rur_data[1]) / float(usd_data[2])
-            table_dict["USD"].sell = float(usd_data[1]) / float(rur_data[2])
+            table_dict["USD"].buy = round(float(usd_data[2]) / float(rur_data[1]), 2)
+            table_dict["USD"].sell = round(float(usd_data[1]) / float(rur_data[2]), 2)
 
-            table_dict["EUR"].buy = float(rur_data[1]) / float(eur_data[2])
-            table_dict["EUR"].sell = float(eur_data[1]) / float(rur_data[2])
+            table_dict["EUR"].buy = round(float(eur_data[2]) / float(rur_data[1]), 2)
+            table_dict["EUR"].sell = round(float(eur_data[1]) / float(rur_data[2]), 2)
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
-            return WebSiteResonse(return_code=StatusCode.EvaluationError)
+            return WebSiteResonse(
+                return_code=StatusCode.EvaluationError, bank=self.bank
+            )
 
-        return WebSiteResonse(return_code=StatusCode.OK, rates=dict(table_dict))
+        return WebSiteResonse(
+            return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
+        )
 
     @staticmethod
     def find_currency(table, currencies):
@@ -85,12 +90,12 @@ class ArdishBank(WebSite):
                     break
         return response
 
+
 class AmeriaBank(WebSite):
     def __init__(self):
         self.url = "https://ameriabank.am/ru/exchange-rates"
-        self.table_xpath = (
-            '//*[@id="dnn_ctr44240_View_grdRates"]'
-        )
+        self.bank = "Ameriabank"
+        self.table_xpath = '//*[@id="dnn_ctr44240_View_grdRates"]'
         self.browser = SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
@@ -102,7 +107,7 @@ class AmeriaBank(WebSite):
             time.sleep(1)
         except Exception as ex:
             logging.error(f"Get request failed {self.url}")
-            return WebSiteResonse(return_code=StatusCode.GetError)
+            return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
             logging.info("Find rates table")
@@ -111,7 +116,7 @@ class AmeriaBank(WebSite):
             )
         except Exception as ex:
             logging.error(f"Find rates table failed: {ex}")
-            return WebSiteResonse(return_code=StatusCode.GetTableError)
+            return WebSiteResonse(return_code=StatusCode.GetTableError, bank=self.bank)
 
         return self.make_response(table)
 
@@ -121,22 +126,26 @@ class AmeriaBank(WebSite):
             for row in BeautifulSoup(table, "html.parser")("tr")
         ]
 
-        logging.info(f"Table schema {table_data[0]}")
+        logging.info(f"Table {table_data}")
         table_dict = defaultdict(Exchange)
         try:
             rur_data, usd_data, eur_data = self.find_currency(
                 table_data, ["RUB", "USD", "EUR"]
             )
-            table_dict["USD"].buy = float(rur_data[3].replace(",", ".")) / float(usd_data[4].replace(",", "."))
-            table_dict["USD"].sell = float(usd_data[3].replace(",", ".")) / float(rur_data[4].replace(",", "."))
+            table_dict["USD"].buy = round(float(usd_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
+            table_dict["USD"].sell = round(float(usd_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
 
-            table_dict["EUR"].buy = float(rur_data[3].replace(",", ".")) / float(eur_data[4].replace(",", "."))
-            table_dict["EUR"].sell = float(eur_data[3].replace(",", ".")) / float(rur_data[4].replace(",", "."))
+            table_dict["EUR"].buy = round(float(eur_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
+            table_dict["EUR"].sell = round(float(eur_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
-            return WebSiteResonse(return_code=StatusCode.EvaluationError)
+            return WebSiteResonse(
+                return_code=StatusCode.EvaluationError, bank=self.bank
+            )
 
-        return WebSiteResonse(return_code=StatusCode.OK, rates=dict(table_dict))
+        return WebSiteResonse(
+            return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
+        )
 
     @staticmethod
     def find_currency(table, currencies):

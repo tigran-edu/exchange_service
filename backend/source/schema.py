@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Schema:
     keys = []
     schema = {}
@@ -19,17 +22,17 @@ class Schema:
 
 
 class ExchangeRateSchema(Schema):
-    keys = ["bank_id"]
+    keys = ["id"]
     schema = {
-        "bank_id": "uuid",
-        "bank_name": "text",
-        "link": "text",
-        "eur->rub": "float",
-        "usd->rub": "float",
-        "rub->eur": "float",
-        "rub->usd": "float",
+        "id": "serial",
+        "bank": "text",
+        "update_time": "bigint",
+        "SELL_EUR": "double precision",
+        "SELL_USD": "double precision",
+        "BUY_EUR": "double precision",
+        "BUY_USD": "double precision",
     }
 
 
 class Tables:
-    tables = {"exchange_rates": ExchangeRateSchema}
+    tables = {"rates": ExchangeRateSchema}

@@ -8,3 +8,4 @@ PyJWT==2.8.0
 pyjwt[crypto]
 python-multipart
 requests==2.31.0
+Jinja2==3.0.3
