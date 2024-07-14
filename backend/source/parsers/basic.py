@@ -15,9 +15,8 @@ class Exchange:
 class StatusCode(IntEnum):
     OK = 0
     GetError = 1
-    ClickError = 2
-    GetTableError = 3
-    EvaluationError = 4
+    GetTableError = 2
+    EvaluationError = 3
 
 
 class WebSiteResonse:
@@ -47,3 +46,13 @@ class WebSite:
     @abc.abstractmethod
     def make_response(self, table: str) -> WebSiteResonse:
         pass
+
+    @staticmethod
+    def find_currency(table, currencies):
+        response = []
+        for currency in currencies:
+            for data in table:
+                if currency in data:
+                    response += [data]
+                    break
+        return response

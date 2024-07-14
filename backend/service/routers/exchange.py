@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 # import logging
 import backend.source.scripts as scripts
 from backend.source.clients.parser import Parser, CONFIG
+from backend.source.parsers.basic import StatusCode
 
 
 router = APIRouter()
@@ -23,5 +24,6 @@ async def get_rates(request: Request):
 async def update_rates(request: Request):
     scripts.create_rates_schema("rates", pg.PG_CLIENT)
     scripts.create_rates_table("rates.am", pg.PG_CLIENT)
-    response = await Parser.pars(CONFIG["ARMENIA"])
-    scripts.write_rates_to_db("rates.am", response, pg.PG_CLIENT)
+    responses = await Parser.pars(CONFIG["ARMENIA"])
+    responses = [resp for resp in responses if resp.return_code == StatusCode.OK]
+    scripts.write_rates_to_db("rates.am", responses, pg.PG_CLIENT)

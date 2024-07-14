@@ -16,7 +16,7 @@ def try_connect():
             counter -= 1
             time.sleep(10)
     if conn == None:
-        raise Exception("Can not connect to the PG.")
+        raise Exception("Can not connect to the browser.")
     return conn
 
 

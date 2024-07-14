@@ -32,6 +32,9 @@ def get_rates_from_db(table_name: str, cursor):
 
 
 def write_rates_to_db(table_name: str, responses: Collection[WebSiteResonse], cursor):
+    if len(responses) == 0:
+        logging.warning("Responses are empty")
+        return
     values = ", ".join([f"(DEFAULT, {str(resp)})" for resp in responses])
     logging.info(f"New rates\n{values}")
     query = sql.INSERT_NEW_RATES.format(

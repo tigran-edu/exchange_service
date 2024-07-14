@@ -3,7 +3,7 @@ from backend.source.parsers.basic import WebSite
 from typing import Collection
 
 
-CONFIG = {"ARMENIA": [ArdishBank(), AmeriaBank()]}
+CONFIG = {"ARMENIA": [ArdishBank(), AmeriaBank(), HSBCBank(), AraratBank(), ConverseBank()]}
 
 
 class ParserResonse:
@@ -11,17 +11,10 @@ class ParserResonse:
         pass
 
 
-async def await_tasks(tasks):
-    response = []
-    for task in tasks:
-        response.append(await task)
-    return response
-
-
 class Parser:
     @staticmethod
     async def pars(websites: Collection[WebSite]) -> ParserResonse:
-        tasks = []
+        responses = []
         for website in websites:
-            tasks += [website.handle()]
-        return await await_tasks(tasks)
+            responses += [await website.handle()]
+        return responses
