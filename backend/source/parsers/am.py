@@ -2,6 +2,8 @@ import backend.source.clients.selenium as selenium
 from backend.source.parsers.basic import *
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import logging
 from collections import defaultdict
 import time
@@ -11,8 +13,11 @@ class ArdishBank(WebSite):
     def __init__(self):
         self.url = "https://ardshinbank.am/for_you/Artarjuyti-poxanakum?lang=ru"
         self.bank = "Ardshinbank"
+        self.besnal_button_xpath = (
+            '/html/body/div[1]/div/div/section[3]/div/div[1]/div[2]/div/div[2]'
+        )
         self.table_xpath = (
-            '//*[@id="__nuxt"]/div/div/section[3]/div/div[1]/div[3]/table'
+            '/html/body/div[1]/div/div/section[3]/div/div[1]/div[3]/table'
         )
         self.browser = selenium.SELENIUM_CLIENT
 
@@ -26,6 +31,15 @@ class ArdishBank(WebSite):
         except Exception as ex:
             logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
+        
+        try:
+            logging.info("Click besnal button")
+            WebDriverWait(self.browser, 20).until(
+                EC.element_to_be_clickable((By.XPATH, self.besnal_button_xpath))
+            ).click()
+        except Exception as ex:
+            logging.error(f"Click besnal button failed: {ex}")
+            return WebSiteResonse(return_code=StatusCode.ClickError, bank=self.bank)
 
         try:
             logging.info("Find rates table")
@@ -259,7 +273,10 @@ class ConverseBank(WebSite):
     def __init__(self):
         self.url = "https://conversebank.am/ru/"
         self.bank = "ConverseBank"
-        self.table_xpath = '//*[@id="currency_row"]/div[2]/table'
+        self.besnal_button_xpath = (
+            '/html/body/div[2]/div/div[2]/div[4]/div/div[1]/div/div/div[2]/div[2]/button[2]'
+        )
+        self.table_xpath = '/html/body/div[2]/div/div[2]/div[4]/div/div[1]/div/div/div[2]/table'
         self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
@@ -272,6 +289,16 @@ class ConverseBank(WebSite):
         except Exception as ex:
             logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
+        
+        try:
+            logging.info("Click besnal button")
+            WebDriverWait(self.browser, 20).until(
+                EC.element_to_be_clickable((By.XPATH, self.besnal_button_xpath))
+            ).click()
+        except Exception as ex:
+            logging.error(f"Click besnal button failed: {ex}")
+            return WebSiteResonse(return_code=StatusCode.ClickError, bank=self.bank)
+
 
         try:
             logging.info("Find rates table")

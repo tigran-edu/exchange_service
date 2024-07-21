@@ -32,6 +32,7 @@ def create_client():
     SELENIUM_CLIENT = try_connect()
     return SELENIUM_CLIENT
 
+
 def close_client():
     global SELENIUM_CLIENT
     SELENIUM_CLIENT.quit()

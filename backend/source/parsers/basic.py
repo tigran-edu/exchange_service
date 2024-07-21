@@ -17,6 +17,7 @@ class StatusCode(IntEnum):
     GetError = 1
     GetTableError = 2
     EvaluationError = 3
+    ClickError = 4
 
 
 class WebSiteResonse:
