@@ -3,7 +3,6 @@ import psycopg2
 import time
 import os
 import logging
-import backend.source.scripts as scripts
 
 _connection = None
 PG_CLIENT = None
@@ -23,13 +22,16 @@ def try_connect():
     conn = None
     while counter > 0:
         try:
+            logging.info("Try to connect to the PostgreDB")
             conn = connect()
             break
-        except Exception:
+        except Exception as ex:
+            logging.warning(f"Connection failed due to exception: {ex}")
             counter -= 1
             time.sleep(10)
     if conn == None:
         raise Exception("Can not connect to the PG.")
+    logging.info("Connection has been established")
     return conn
 
 
@@ -38,9 +40,10 @@ def create_pg_client():
     _connection = try_connect()
     _connection.autocommit = True
     PG_CLIENT = _connection.cursor(cursor_factory=RealDictCursor)
+    return PG_CLIENT
 
 
 def close_client():
-    global PG_CLIENT
+    global PG_CLIENT, _connection
     _connection.close()
     PG_CLIENT.close()

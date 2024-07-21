@@ -12,6 +12,4 @@ COPY ./ ./
 
 ENV PYTHONPATH "${PYTHONPATH}:$SERVICE_DIR"
 
-RUN echo $SERVICE_DIR
-
-ENTRYPOINT python -u $SERVICE_DIR/service/__init__.py
+ENTRYPOINT python -u $SERVICE_DIR/service/api/__init__.py
