@@ -7,7 +7,7 @@ from backend.source.clients.parser import Parser
 from backend.source.parsers.basic import StatusCode
 from backend.source.parsers import get_all_banks
 
-COUNTRIES = ["am"]
+COUNTRIES = ["am", "ge"]
 SCHEMA_NAME = "rates"
 
 

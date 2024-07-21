@@ -1,4 +1,5 @@
-from backend.source.parsers.am import *
+# from backend.source.parsers.am import *
+from backend.source.parsers.ge import *
 from collections import defaultdict
 import sys
 import inspect

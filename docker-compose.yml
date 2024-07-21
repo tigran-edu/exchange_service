@@ -13,7 +13,7 @@ services:
       - ../2. Init Database:/docker-entrypoint-initdb.d
       - rates:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - global_network
 
