@@ -28,25 +28,11 @@ services:
     networks:
       - global_network
 
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4:7
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    networks:
-      - global_network
-
   backend:
     container_name: backend
     build:
       context: ./
-      dockerfile: backend/service/Dockerfile
+      dockerfile: backend/service/api/Dockerfile
     environment:
       PYTHONUNBUFFERED: 1
       UVICORN_PORT: 80
@@ -58,11 +44,35 @@ services:
       POSTGRES_PORT: 5432
     ports:
       - "80:80"
-    links:
-      - selenium
-      - postgres
     networks:
       - global_network
+
+  updater:
+    container_name: updater
+    build:
+      context: ./
+      dockerfile: backend/service/updater/Dockerfile
+    environment:
+      PYTHONUNBUFFERED: 1
+      POSTGRES_DB: "rates_db"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "user"
+      POSTGRES_HOST: "rates_db"
+      POSTGRES_PORT: 5432
+    networks:
+      - global_network
+
+  restarter:
+    container_name: restarter
+    image: docker:cli
+    volumes: [ "/var/run/docker.sock:/var/run/docker.sock" ]
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "while true; do sleep 3600; docker restart updater; done"
+      ]
+    restart: unless-stopped
 
 volumes:
   rates:
@@ -73,3 +83,5 @@ volumes:
 networks:
   global_network:
     name: global_network
+  local_network:
+    name: local_network

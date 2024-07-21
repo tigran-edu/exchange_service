@@ -1,5 +1,9 @@
 from selenium import webdriver
 import time
+import logging
+
+
+SELENIUM_CLIENT = None
 
 
 def try_connect():
@@ -8,16 +12,26 @@ def try_connect():
     options = webdriver.ChromeOptions()
     while counter > 0:
         try:
+            logging.info("Try to connect to the Selenium")
             conn = webdriver.Remote(
                 command_executor="http://selenium:4444/wd/hub", options=options
             )
             break
-        except Exception:
+        except Exception as ex:
+            logging.info(f"Connection failed due to {ex}")
             counter -= 1
             time.sleep(10)
     if conn == None:
         raise Exception("Can not connect to the browser.")
+    logging.info("Conection has been established")
     return conn
 
 
-SELENIUM_CLIENT = try_connect()
+def create_client():
+    global SELENIUM_CLIENT
+    SELENIUM_CLIENT = try_connect()
+    return SELENIUM_CLIENT
+
+def close_client():
+    global SELENIUM_CLIENT
+    SELENIUM_CLIENT.quit()

@@ -1,9 +1,7 @@
 import backend.source.sql as sql
 from backend.source.schema import Tables
 from backend.source.parsers.basic import WebSiteResonse
-from backend.source.clients.parser import CONFIG
 from typing import Collection
-from hashlib import md5
 import logging
 
 
@@ -25,7 +23,8 @@ def delete_table(table_name: str, cursor):
 
 def get_rates_from_db(table_name: str, cursor):
     logging.info("Get rates from db table_name")
-    query = sql.GET_RATES.format(table_name, len(CONFIG["ARMENIA"]))
+    _, country = table_name.split(".")
+    query = sql.GET_RATES.format(table_name, 5)
     logging.info(f"SQL QUERY {query}")
     cursor.execute(query)
     return cursor.fetchall()

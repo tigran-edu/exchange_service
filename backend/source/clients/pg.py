@@ -35,8 +35,8 @@ def try_connect():
     return conn
 
 
-def create_pg_client():
-    global PG_CLIENT
+def create_client():
+    global PG_CLIENT, _connection
     _connection = try_connect()
     _connection.autocommit = True
     PG_CLIENT = _connection.cursor(cursor_factory=RealDictCursor)

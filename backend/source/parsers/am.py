@@ -1,10 +1,7 @@
+import backend.source.clients.selenium as selenium
 from backend.source.parsers.basic import *
-from backend.source.clients.selenium import SELENIUM_CLIENT
 from bs4 import BeautifulSoup
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import logging
 from collections import defaultdict
 import time
@@ -17,7 +14,7 @@ class ArdishBank(WebSite):
         self.table_xpath = (
             '//*[@id="__nuxt"]/div/div/section[3]/div/div[1]/div[3]/table'
         )
-        self.browser = SELENIUM_CLIENT
+        self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
         logging.info(f"Handle start for {self.bank}")
@@ -27,7 +24,7 @@ class ArdishBank(WebSite):
             self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
-            logging.error(f"Get request failed {self.url}")
+            logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
@@ -68,12 +65,13 @@ class ArdishBank(WebSite):
             return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
         )
 
+
 class AmeriaBank(WebSite):
     def __init__(self):
         self.url = "https://ameriabank.am/ru/exchange-rates"
         self.bank = "Ameriabank"
         self.table_xpath = '//*[@id="dnn_ctr44240_View_grdRates"]'
-        self.browser = SELENIUM_CLIENT
+        self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
         logging.info(f"Handle start for {self.bank}")
@@ -83,7 +81,7 @@ class AmeriaBank(WebSite):
             self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
-            logging.error(f"Get request failed {self.url}")
+            logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
@@ -109,11 +107,27 @@ class AmeriaBank(WebSite):
             rur_data, usd_data, eur_data = self.find_currency(
                 table_data, ["RUB", "USD", "EUR"]
             )
-            table_dict["USD"].sell = round(float(usd_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
-            table_dict["USD"].buy = round(float(usd_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
+            table_dict["USD"].sell = round(
+                float(usd_data[4].replace(",", "."))
+                / float(rur_data[3].replace(",", ".")),
+                2,
+            )
+            table_dict["USD"].buy = round(
+                float(usd_data[3].replace(",", "."))
+                / float(rur_data[4].replace(",", ".")),
+                2,
+            )
 
-            table_dict["EUR"].sell = round(float(eur_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
-            table_dict["EUR"].buy = round(float(eur_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
+            table_dict["EUR"].sell = round(
+                float(eur_data[4].replace(",", "."))
+                / float(rur_data[3].replace(",", ".")),
+                2,
+            )
+            table_dict["EUR"].buy = round(
+                float(eur_data[3].replace(",", "."))
+                / float(rur_data[4].replace(",", ".")),
+                2,
+            )
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
             return WebSiteResonse(
@@ -123,13 +137,16 @@ class AmeriaBank(WebSite):
         return WebSiteResonse(
             return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
         )
+
 
 class HSBCBank(WebSite):
     def __init__(self):
         self.url = "https://www.hsbc.am/en-am/help/rates/"
         self.bank = "HSBC"
-        self.table_xpath = '/html/body/main/div[2]/div/div[1]/div/div/div[1]/div[1]/div/table/tbody'
-        self.browser = SELENIUM_CLIENT
+        self.table_xpath = (
+            "/html/body/main/div[2]/div/div[1]/div/div/div[1]/div[1]/div/table/tbody"
+        )
+        self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
         logging.info(f"Handle start for {self.bank}")
@@ -139,7 +156,7 @@ class HSBCBank(WebSite):
             self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
-            logging.error(f"Get request failed {self.url}")
+            logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
@@ -179,15 +196,14 @@ class HSBCBank(WebSite):
         return WebSiteResonse(
             return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
         )
+
 
 class AraratBank(WebSite):
     def __init__(self):
         self.url = "https://www.araratbank.am/en/"
         self.bank = "AraratBank"
-        self.table_xpath = (
-            '/html/body/main/div[2]/div/div/div[3]/div/div/div/div[2]/div[1]/div/div/table'
-        )
-        self.browser = SELENIUM_CLIENT
+        self.table_xpath = "/html/body/main/div[2]/div/div/div[3]/div/div/div/div[2]/div[1]/div/div/table"
+        self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
         logging.info(f"Handle start for {self.bank}")
@@ -197,7 +213,7 @@ class AraratBank(WebSite):
             self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
-            logging.error(f"Get request failed {self.url}")
+            logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:
@@ -238,14 +254,13 @@ class AraratBank(WebSite):
             return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
         )
 
+
 class ConverseBank(WebSite):
     def __init__(self):
         self.url = "https://conversebank.am/ru/"
         self.bank = "ConverseBank"
-        self.table_xpath = (
-            '//*[@id="currency_row"]/div[2]/table'
-        )
-        self.browser = SELENIUM_CLIENT
+        self.table_xpath = '//*[@id="currency_row"]/div[2]/table'
+        self.browser = selenium.SELENIUM_CLIENT
 
     async def handle(self) -> WebSiteResonse:
         logging.info(f"Handle start for {self.bank}")
@@ -255,7 +270,7 @@ class ConverseBank(WebSite):
             self.browser.get(self.url)
             time.sleep(1)
         except Exception as ex:
-            logging.error(f"Get request failed {self.url}")
+            logging.error(f"Get request failed {self.url}\nError: {ex}")
             return WebSiteResonse(return_code=StatusCode.GetError, bank=self.bank)
 
         try:

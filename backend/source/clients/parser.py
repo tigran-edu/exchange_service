@@ -3,9 +3,6 @@ from backend.source.parsers.basic import WebSite
 from typing import Collection
 
 
-CONFIG = {"ARMENIA": [ArdishBank(), AmeriaBank(), HSBCBank(), AraratBank(), ConverseBank()]}
-
-
 class ParserResonse:
     def __init__(self):
         pass

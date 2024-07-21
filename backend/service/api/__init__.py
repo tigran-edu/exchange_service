@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from backend.service.api.routers import exchange
-from backend.source.clients.pg import create_pg_client, close_client
+from backend.source.clients.pg import create_client, close_client
 import uvicorn
 import logging
 import os
@@ -17,7 +17,7 @@ def get_uvicorn_config():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.info("Creating PG client")
-    create_pg_client()
+    create_client()
     yield
     close_client()
 
