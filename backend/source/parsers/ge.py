@@ -44,11 +44,11 @@ class CartuBank(WebSite):
             rur_data, usd_data, eur_data = self.find_currency(
                 table_data, ["RUB", "USD", "EUR"]
             )
-            table_dict["USD"].sell = round(float(usd_data[2]) / float(rur_data[1]), 2)
-            table_dict["USD"].buy = round(float(usd_data[1]) / float(rur_data[2]), 2)
+            table_dict["USD"].sell = float(usd_data[2]) / float(rur_data[1])
+            table_dict["USD"].buy = float(usd_data[1]) / float(rur_data[2])
 
-            table_dict["EUR"].sell = round(float(eur_data[2]) / float(rur_data[1]), 2)
-            table_dict["EUR"].buy = round(float(eur_data[1]) / float(rur_data[2]), 2)
+            table_dict["EUR"].sell = float(eur_data[2]) / float(rur_data[1])
+            table_dict["EUR"].buy = float(eur_data[1]) / float(rur_data[2])
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
             return WebSiteResonse(

@@ -3,6 +3,7 @@ from backend.source.schema import Tables
 from backend.source.parsers.basic import WebSiteResonse
 from typing import Collection
 import logging
+from backend.source.parsers import get_all_banks
 
 
 def create_rates_schema(schema_name: str, cursor):
@@ -24,7 +25,7 @@ def delete_table(table_name: str, cursor):
 def get_rates_from_db(table_name: str, cursor):
     logging.info("Get rates from db table_name")
     _, country = table_name.split(".")
-    query = sql.GET_RATES.format(table_name, 5)
+    query = sql.GET_RATES.format(table_name, len(get_all_banks()[country]))
     logging.info(f"SQL QUERY {query}")
     cursor.execute(query)
     return cursor.fetchall()

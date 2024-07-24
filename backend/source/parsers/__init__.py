@@ -1,4 +1,4 @@
-# from backend.source.parsers.am import *
+from backend.source.parsers.am import *
 from backend.source.parsers.ge import *
 from collections import defaultdict
 import sys
@@ -14,3 +14,12 @@ def get_all_banks():
             logging.info(f"Country: {country}, Bank: {name}")
             banks[country].append(obj())
     return banks
+
+def get_all_countries():
+    contries = set()
+    logging.info("INIT CONFIG")
+    for name, obj in inspect.getmembers(sys.modules[__name__]):
+        if inspect.isclass(obj) and "Bank" in name:
+            contries.add(str(obj).split(".")[-2])
+            
+    return contries
