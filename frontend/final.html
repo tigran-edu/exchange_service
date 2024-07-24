@@ -154,10 +154,12 @@
                             </table>
                         </div>
                         {% endfor %}
+
                         <div class="not-shown" id="table-tech">
                             <table>
                                 <tbody>
-                                    {% for bank in country.tech_rates %}
+                                    {% for country in countries %}
+                                        {% for bank in country.tech_rates %}
                                     <tr>
                                         <td id="tech-name-{{ bank.bank }}">{{ bank.bank }}</td>
                                         <td id="tech-{{ bank.bank }}-1">{{ bank.sell_eur }}</td>
@@ -165,6 +167,7 @@
                                         <td id="tech-{{ bank.bank }}-3">{{ bank.sell_usd }}</td>
                                         <td id="tech-{{ bank.bank }}-4">{{ bank.buy_usd }}</td>
                                     </tr>
+                                        {% endfor %}
                                     {% endfor %}
                                 </tbody>
                             </table>
