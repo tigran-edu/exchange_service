@@ -33,6 +33,15 @@ def round_rates(rates):
     return round_rates
 
 
+def tech_rates(rates):
+    rates = copy.deepcopy(rates)
+    for rate in rates:
+        rate['sell_eur'] = str(1 / float(rate['sell_eur']))
+        rate['sell_usd'] = str(1 / float(rate['sell_usd']))
+    return rates
+
+
+
 @router.get("/rates", response_class=HTMLResponse)
 async def get_rates(request: Request):
     logging.info("Get Rates")
@@ -45,7 +54,7 @@ async def get_rates(request: Request):
             {
             "index": country,
             "name": COUNTRIES[country],
-            "tech_rates": rates,
+            "tech_rates": tech_rates(rates),
             "rates": round_rates(rates),
             "is_visible": "" if is_visible else "not-shown",
             "enabled_button": "disabled" if is_visible else ""

@@ -101,8 +101,6 @@
                         {% for country in countries %}
                         <!-- Таблицы с курсами, .not-shown отвечает за скрытие таблицы при нажатии кнопки. CSS для этого класса в <head>. При добавлении новых стран нужно обновить массив таблиц в JS в конце <body> -->
                         <div class="mt-3 mb-3 {{ country.is_visible }}" id="content-{{ country.index }}">
-                            <!-- <h5 id="country-name-{{ country.index }}">{{ country.name }}</h5> -->
-                            <!-- Менюшка с выбором стран. При добавлении новых стран нужно обновить массив кнопок и привязку обработчиков событий в JS в нижней части <body> -->
                             <table id="table-{{ country.index }}"
                                 class="table table-hover overflow-x-scroll mb-1 bg-white">
                                 <thead>
@@ -157,7 +155,7 @@
                         
                         <div class="not-shown">
                             {% for country in countries %}
-                            <table id="table-tech-{{ country.index }}">
+                            <table id="tech-table-{{ country.index }}">
                                 <tbody>
                                         {% for bank in country.tech_rates %}
                                     <tr>
@@ -187,9 +185,9 @@
                                 <div class="col">
                                     {% for country in countries %}
                                     <form class="{{ country.is_visible }}" id="bank-select-{{ country.index }}">
-                                        <select class="form-select">
+                                        <select class="form-select" id="select-{{ country.index }}">
                                             {% for bank in country.rates %}
-                                            <option value="{{ loop.index }}" selected> {{ bank.bank }} </option>
+                                            <option value="{{ loop.index - 1 }}"> {{ bank.bank }} </option>
                                             {% endfor %}
                                         </select>
                                     </form>
@@ -198,33 +196,33 @@
                             </div>
                             <div class="row row-cols-2 justify-content-center mt-2 px-3">
                                 <div class="col-xs">
-                                    <form>
-                                        <select class="form-select" id="form-select-cur-1">
-                                            <option value="1" selected>RUR</option>
-                                            <option value="2">USD</option>
-                                            <option value="3">EUR</option>
+                                    <form id="form-select-cur-1">
+                                        <select class="form-select" id="select-cur-1">
+                                            <option id='select-cur-1-option-1' value="1" selected>RUR</option>
+                                            <option id='select-cur-1-option-2' value="2">USD</option>
+                                            <option id='select-cur-1-option-3' value="3">EUR</option>
                                         </select>
                                     </form>
                                 </div>
                                 <div class="col-xs">
-                                    <form>
-                                        <select class="form-select" id="form-select-cur-2">
-                                            <option value="1" disabled>RUR</option>
-                                            <option value="2" selected>USD</option>
-                                            <option value="3">EUR</option>
+                                    <form id="form-select-cur-2">
+                                        <select class="form-select" id="select-cur-2">
+                                            <option id='select-cur-2-option-1' value="1" disabled>RUR</option>
+                                            <option id='select-cur-2-option-2' value="2" selected>USD</option>
+                                            <option id='select-cur-2-option-3' value="3">EUR</option>
                                         </select>
                                     </form>
                                 </div>
                             </div>
                             <div class="row row-cols-2 justify-content-center mt-2 px-3">
                                 <div class="col-xs">
-                                    <form id="forma">
-                                        <input type="number" class="form-control" id="floatingInput">
+                                    <form id="input-form-1">
+                                        <input type="number" class="form-control" id="number1" name="number1">
                                     </form>
                                 </div>
                                 <div class="col-xs">
-                                    <form id="forma2">
-                                        <input type="number" class="form-control" id="floatingInput">
+                                    <form id="input-form-2">
+                                        <input type="number" class="form-control" id="number2" name="number2">
                                     </form>
                                 </div>
                             </div>
@@ -246,6 +244,11 @@
             "Armenia",
             "Georgia"
         ]
+        let selected_country = "{{ countries[0].index }}";
+        let selected_table = document.getElementById("tech-table-" + selected_country);
+        let form_select_bank = document.getElementById("select-" + selected_country);
+        let selected_bank = 0;
+
         // Массив с таблицами (!ОБНОВИТЬ ПРИ ДОБАВЛЕНИИ СТРАНЫ!)
         const tables = [
             document.getElementById('content-am'),
@@ -272,6 +275,9 @@
             });
             buttons.forEach((element, i) => {
                 if (i === index) {
+                    selected_country = element.id.split('-')[1];
+                    selected_table = document.getElementById("tech-table-" + selected_country);
+                    form_select_bank = document.getElementById("bank-select-" + selected_country);
                     element.classList.add('disabled');
                 } else {
                     element.classList.remove('disabled');
@@ -285,14 +291,139 @@
                 }
             });
             document.getElementById('button-country').textContent = countries_list[index];
+            selected_bank = 0;
+            koefsChange();
         }
         // Привязка обработчиков событий (!ОБНОВИТЬ ПРИ ДОБАВЛЕНИИ СТРАНЫ!)
         document.getElementById('button-am').addEventListener('click', () => showElement(0));
         document.getElementById('button-ge').addEventListener('click', () => showElement(1));
-    </script>
-    <!-- Скрипт, отвечающий за работу конвертера. Требуется обновить его при добавлении новых стран. Нужные части кода отмечены комментариями -->
-    <script>
-        // Скрипт конвертера
+        document.getElementById('button-am').addEventListener('click', () => logFormData2());
+        document.getElementById('button-ge').addEventListener('click', () => logFormData2());
+
+        function changeBank(index) {
+            selected_bank = Number(document.getElementById("select-" + selected_country).value);
+            koefsChange();
+        }
+
+        const formcur1 = document.getElementById('select-cur-1');
+        const formcur2 = document.getElementById('select-cur-2');
+
+        const input_form_1 = document.getElementById('input-form-1');
+        const input_form_2 = document.getElementById('input-form-2');
+
+        let koefstraight = selected_table.rows[selected_bank].cells[3].innerHTML;
+        let koefreversed = selected_table.rows[selected_bank].cells[4].innerHTML;
+
+        function koefsChange() {
+            let i = 0;
+            let o = 0;
+
+            if (formcur1.value == 1){
+                if (formcur2.value == 2) {
+                    i = 3;
+                    o = 4;
+                }
+                else {
+                    i = 1;
+                    o = 2;
+                }
+            }
+            else {
+                if (formcur1.value == 2) {
+                    i = 4;
+                    o = 3;
+                }
+                else {
+                    i = 2;
+                    o = 1;
+                }
+            }
+
+            koefstraight = selected_table.rows[selected_bank].cells[i].innerHTML;
+            koefreversed = selected_table.rows[selected_bank].cells[o].innerHTML;
+        }
+
+        // Функции для деактивации валют во второй форме
+        function ConfigCurrency() {
+            if (formcur1.value == 1) {
+                document.getElementById('select-cur-2-option-1').setAttribute("disabled", "");
+                document.getElementById('select-cur-2-option-1').removeAttribute("selected");
+                document.getElementById('select-cur-2-option-2').removeAttribute("disabled");
+                document.getElementById('select-cur-2-option-2').setAttribute("selected", "");
+                document.getElementById('select-cur-2-option-3').removeAttribute("disabled");
+            }
+            else {
+                document.getElementById('select-cur-2-option-1').removeAttribute("disabled");
+                document.getElementById('select-cur-2-option-1').setAttribute("selected", "");
+                document.getElementById('select-cur-2-option-2').setAttribute("disabled", "");
+                document.getElementById('select-cur-2-option-2').removeAttribute("selected");
+                document.getElementById('select-cur-2-option-3').setAttribute("disabled", "");
+                document.getElementById('select-cur-2-option-3').removeAttribute("selected");
+            }
+        }
+
+        // Функции для получения данных из формы и вывода их в консоль
+        function logFormData() {
+            const formData2 = new FormData(input_form_2);
+
+            //const amount = formData.get('number');
+            const amount2 = formData2.get('number2');
+
+            const element = document.getElementById('number1');
+            //const element2 = document.getElementById('number2');
+
+            //console.log('Number:', amount);
+            console.log('Number2:', amount2);
+
+
+            element.value = (amount2 * koefreversed).toFixed(2);
+
+            //element2.value = amount;
+        }
+
+        function logFormData2() {
+            const formData = new FormData(input_form_1);
+
+            const amount = formData.get('number1');
+            //const amount2 = formData2.get('number2');
+
+            //const element = document.getElementById('number');
+            const element2 = document.getElementById('number2');
+
+            console.log('Number:', amount);
+            //console.log('Number2:', amount2);
+
+            // element.value = amount2;
+
+            element2.value = (amount * koefstraight).toFixed(2);
+        }
+
+        // Добавляем обработчики событий для всех полей формы
+        input_form_2.addEventListener('input', logFormData);
+        input_form_2.addEventListener('change', logFormData);
+
+        input_form_1.addEventListener('input', logFormData2);
+        input_form_1.addEventListener('change', logFormData2);
+
+        formcur1.addEventListener('input', ConfigCurrency);
+        formcur1.addEventListener('change', ConfigCurrency);
+        formcur1.addEventListener('input', logFormData2);
+        formcur1.addEventListener('change', logFormData2);
+        formcur1.addEventListener('input', koefsChange);
+        formcur1.addEventListener('change', koefsChange);
+
+        formcur2.addEventListener('input', logFormData2);
+        formcur2.addEventListener('change', logFormData2);
+        formcur2.addEventListener('input', koefsChange);
+        formcur2.addEventListener('change', koefsChange);
+
+        form_select_bank.addEventListener('input', koefsChange);
+        form_select_bank.addEventListener('change', koefsChange);
+        form_select_bank.addEventListener('input', logFormData2);
+        form_select_bank.addEventListener('change', logFormData2);
+        form_select_bank.addEventListener('input', changeBank);
+        form_select_bank.addEventListener('change', changeBank);
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
