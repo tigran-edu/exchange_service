@@ -154,11 +154,11 @@
                             </table>
                         </div>
                         {% endfor %}
-
-                        <div class="not-shown" id="table-tech">
-                            <table>
+                        
+                        <div class="not-shown">
+                            {% for country in countries %}
+                            <table id="table-tech-{{ country.index }}">
                                 <tbody>
-                                    {% for country in countries %}
                                         {% for bank in country.tech_rates %}
                                     <tr>
                                         <td id="tech-name-{{ bank.bank }}">{{ bank.bank }}</td>
@@ -168,9 +168,9 @@
                                         <td id="tech-{{ bank.bank }}-4">{{ bank.buy_usd }}</td>
                                     </tr>
                                         {% endfor %}
-                                    {% endfor %}
                                 </tbody>
                             </table>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -219,24 +219,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Менюшка с выбором стран. При добавлении новых стран нужно обновить массив кнопок и привязку обработчиков событий в JS в нижней части <body> -->
-                        <!-- <div class="text-center my-3">
-                            <div class="btn-group dropdown-center px-auto">
-                                <button type="button" class="btn btn-dark btn-lg dropdown-toggle"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Choose country
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><button class="dropdown-item disabled" type="button"
-                                            id="button-am">Armenia</button></li>
-                                    <li><button class="dropdown-item" type="button" id="button-ge">Georgia</button></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><button class="dropdown-item" type="button">Best rates</button></li>
-                                </ul>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
             </div>
