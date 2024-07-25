@@ -2,7 +2,7 @@ import abc
 import time
 from enum import IntEnum
 from typing import Optional
-
+import logging
 
 class Exchange:
     buy: float
@@ -56,4 +56,5 @@ class WebSite:
                 if currency in data:
                     response += [data]
                     break
+        logging.info(f"Response {response}")
         return response

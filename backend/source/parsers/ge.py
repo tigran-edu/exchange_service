@@ -90,21 +90,21 @@ class SwissCapitalBank(WebSite):
 
     def make_response(self, table: str) -> WebSiteResonse:
         table_data = [
-            [cell.text for cell in row("td")]
+            [cell.text.strip() for cell in row("td")]
             for row in BeautifulSoup(table, "html.parser")("tr")
         ]
 
         logging.info(f"Table {table_data}")
         table_dict = defaultdict(Exchange)
         try:
-            rur_data, usd_data, eur_data = self.find_currency(
+            rur_data, usd_data, eur_data = self._find_currency(
                 table_data, ["RUB", "USD", "EUR"]
             )
-            table_dict["USD"].sell = round(float(usd_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
-            table_dict["USD"].buy = round(float(usd_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
+            table_dict["USD"].sell = float(usd_data[1]) * 10 / float(rur_data[2])
+            table_dict["USD"].buy = float(usd_data[2]) * 10 / float(rur_data[1])
 
-            table_dict["EUR"].sell = round(float(eur_data[4].replace(",", "."))/ float(rur_data[3].replace(",", ".")), 2)
-            table_dict["EUR"].buy = round(float(eur_data[3].replace(",", ".")) / float(rur_data[4].replace(",", ".")), 2)
+            table_dict["EUR"].sell = float(eur_data[1]) * 10 / float(rur_data[2])
+            table_dict["EUR"].buy = float(eur_data[2]) * 10 / float(rur_data[1])
         except Exception as ex:
             logging.error(f"Evaluation error: {ex}")
             return WebSiteResonse(
@@ -114,3 +114,16 @@ class SwissCapitalBank(WebSite):
         return WebSiteResonse(
             return_code=StatusCode.OK, bank=self.bank, rates=dict(table_dict)
         )
+
+    @staticmethod
+    def _find_currency(table, currencies):
+        response = []
+        for currency in currencies:
+            for data in table:
+                for cell in data:
+                    logging.info(f"ALAX {cell}")
+                    if currency in cell:
+                        response += [data]
+                        break
+        logging.info(f"Response {response}")
+        return response
